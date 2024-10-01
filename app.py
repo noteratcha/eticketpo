@@ -199,7 +199,7 @@ def register():
     # ส่งข้อมูลกลับเป็น JSON หลังสมัครสำเร็จ
     return jsonify({'status': 'success', 'message': 'สมัครสมาชิกสำเร็จ!'})
 
-if __name__ == '__main__':
-    create_db()  # สร้างฐานข้อมูลเมื่อเริ่มต้นแอป
-    port = int(os.environ.get("PORT", 5000))  # ใช้ port จาก environment ถ้ามี, ค่าเริ่มต้นคือ 5000
-    app.run(debug=True, port=port)
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
+
