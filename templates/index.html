@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eTicketPo.com</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            color: #333;
+        }
+
+        .content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: calc(100vh - 100px); /* ปรับให้สูงเต็มหน้าจอ */
+            text-align: center; /* จัดข้อความให้อยู่กลางในแนวนอน */
+        }
+
+        .iframe-container {
+            flex-grow: 1;
+            width: 100%;
+            height: calc(100vh - 100px);
+            border: none;
+            overflow: hidden;
+        }
+
+        /* Custom Styles */
+        .navbar .dropdown-menu {
+            background-color: white;
+            border: 1px solid #ccc;
+        }
+
+        .navbar .dropdown-item {
+            color: #007BFF;
+        }
+
+        .navbar .dropdown-item:hover {
+            background-color: #f5f5f5;
+        }
+
+        /* ปรับการแสดงผล modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: flex-start; /* แสดงผลด้านบน */
+            padding-top: 30px; /* เพิ่มระยะห่างจากด้านบน */
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 400px;
+            max-width: 100%;
+            margin: 0 auto; /* แสดงผลกึ่งกลางในแนวนอน */
+        }
+
+        .modal-header {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .modal-body input,
+        .modal-body select {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .modal-footer {
+            text-align: center;
+        }
+
+        .modal-footer button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 0 auto; /* แสดงผลกึ่งกลางในแนวนอน */
+        }
+
+        .modal-footer button:hover {
+            background-color: #0056b3;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        input {
+            box-sizing: border-box;
+            display: block;
+            width: 100%;
+        }
+
+        /* ปรับขนาดของปุ่ม */
+        .btn-small {
+            padding: 5px 10px;
+            font-size: 0.8em;
+            width: auto;
+        }
+         /* สไตล์สำหรับตัวกระพริบ */
+         @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        h1.blink {
+            color: red; /* สีแดง */
+            animation: blink 1s infinite; /* กระพริบทุก 1 วินาที */
+        }
+        h1.colortext {
+            color: rgb(185, 37, 37); /* สีแดง */
+            font-size: 1em; /* ปรับขนาดตัวอักษรให้เล็กลง */
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('index') }}">eTicketPo.com</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{{ url_for('index') }}">หน้าหลัก</a>
+                    </li>
+                    <!-- เมนูข้อมูลผู้ฝาก -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="loadIframe('{{ url_for('user_info') }}')">ข้อมูลผู้ฝาก</a> <!-- เพิ่มเมนู ข้อมูลผู้ฝาก -->
+                    </li>
+                    <!-- Dropdown PDF To Excel -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="pdfToExcelDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            PDF To Excel
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="pdfToExcelDropdown">
+                            <li><a class="dropdown-item" href="#" onclick="loadIframe('{{ url_for('ticketpdf') }}')">ใบสั่งค่าปรับจราจร</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="loadIframe('{{ url_for('noticepdf') }}')">ใบแจ้งเตือน</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="loadIframe('{{ url_for('exceldpost') }}')">Excel D-Post</a></li> <!-- เพิ่มเมนู Excel D-Post -->
+                        </ul>
+                    </li>
+
+                    <!-- New Menu Items -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="loadIframe('{{ url_for('topup') }}')">เติมเครดิต</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="loadIframe('{{ url_for('contact') }}')">ติดต่อผู้ดูแล</a>
+                    </li>
+
+                </ul>
+                <button class="btn btn-light btn-small" onclick="openModal()">สมัครสมาชิก / Register</button>
+            </div>
+        </div>
+    </nav>
+    
+
+    <!-- เนื้อหาหลัก -->
+    <div class="content" id="main-content">
+        <h1>ยินดีต้อนรับ</h1><br>
+        <p>นี่คือหน้าแสดงผล ระบบ eTicketPo.com<br>จะทำหน้าที่แปลงข้อมูลจากไฟล์ PDF (รวมหลายๆหน้า) เป็น Excel</p><br>
+        <h1 class="blink">ทดลองใช้งาน ฟรี!</h1>
+        <h1 class="colortext">เมนู PDF To Excel</h1>
+        <h1 class="colortext">1. ใบสั่งค่าปรับจราจร</h1>
+        <h1 class="colortext">2. ใบแจ้งเตือน</h1>
+    </div>
+
+    <iframe id="iframe" class="iframe-container" src="" frameborder="0" style="display:none;"></iframe>
+
+    <!-- Modal สำหรับการสมัครสมาชิก -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">สมัครสมาชิก / Register</div>
+            <div class="modal-body">
+                <form id="registerForm" action="/register" method="post" onsubmit="return validateForm()">
+                    <input type="text" id="user" name="user" placeholder="User  *" required>
+                    <div id="userError" class="error-message"></div>
+
+                    <input type="password" id="password" name="password" placeholder="Password  *" required>
+                    <div id="passwordError" class="error-message"></div>
+
+                    <!-- เพิ่มช่อง Confirm Password -->
+                    <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm Password  *" required>
+                    <div id="confirmPasswordError" class="error-message"></div>
+
+                    <input type="text" id="organization" name="organization" placeholder="ชื่อหน่วยงาน  *" required>
+                    <div id="organizationError" class="error-message"></div>
+
+                    <input type="text" id="address" name="address" placeholder="ที่อยู่หน่วยงาน  *" required>
+                    <div id="addressError" class="error-message"></div>
+
+                    <input type="text" id="district" name="district" placeholder="อำเภอ  *" required>
+                    <div id="districtError" class="error-message"></div>
+
+                    <input type="text" id="province" name="province" placeholder="จังหวัด  *" required>
+                    <div id="provinceError" class="error-message"></div>
+
+                    <input type="text" id="zipcode" name="zipcode" placeholder="รหัสไปรษณีย์  *" required>
+                    <div id="zipcodeError" class="error-message"></div>
+
+                    <input type="text" id="phone" name="phone" placeholder="เบอร์โทร  *" required>
+                    <div id="phoneError" class="error-message"></div>
+
+                    <input type="text" name="referrer" placeholder="รหัสผู้แนะนำ (ถ้ามี ได้เครดิตฟรี 500 Point)">
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">สมัครสมาชิก</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        function loadIframe(url) {
+            document.getElementById('main-content').style.display = "none";
+            document.getElementById('iframe').style.display = "block";
+            document.getElementById('iframe').src = url;
+        }
+
+        function openModal() {
+            document.getElementById('registerModal').style.display = 'flex';
+        }
+
+        window.onclick = function(event) {
+            if (event.target == document.getElementById('registerModal')) {
+                document.getElementById('registerModal').style.display = 'none';
+            }
+        }
+
+        function validateForm() {
+            let valid = true;
+
+            let user = document.getElementById('user').value;
+            let password = document.getElementById('password').value;
+            let confirmPassword = document.getElementById('confirm_password').value;
+            let organization = document.getElementById('organization').value;
+            let address = document.getElementById('address').value;
+            let district = document.getElementById('district').value;
+            let province = document.getElementById('province').value;
+            let zipcode = document.getElementById('zipcode').value;
+            let phone = document.getElementById('phone').value;
+
+            let userError = document.getElementById('userError');
+            let passwordError = document.getElementById('passwordError');
+            let confirmPasswordError = document.getElementById('confirmPasswordError');
+            let organizationError = document.getElementById('organizationError');
+            let addressError = document.getElementById('addressError');
+            let districtError = document.getElementById('districtError');
+            let provinceError = document.getElementById('provinceError');
+            let zipcodeError = document.getElementById('zipcodeError');
+            let phoneError = document.getElementById('phoneError');
+
+            // ตรวจสอบชื่อผู้ใช้
+            let userRegex = /^[a-zA-Z0-9]+$/;
+            if (!userRegex.test(user)) {
+                userError.textContent = "ชื่อผู้ใช้ต้องมีแค่ตัวอักษรภาษาอังกฤษและตัวเลข";
+                valid = false;
+            } else {
+                userError.textContent = "";
+            }
+
+            // ตรวจสอบรหัสผ่าน
+            let passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+            if (!passwordRegex.test(password)) {
+                passwordError.textContent = "รหัสผ่านต้องมีอักษรพิมพ์ใหญ่ พิมพ์เล็ก ตัวเลข และยาวอย่างน้อย 8 ตัว";
+                valid = false;
+            } else {
+                passwordError.textContent = "";
+            }
+
+            // ตรวจสอบ Confirm Password
+            if (confirmPassword !== password) {
+                confirmPasswordError.textContent = "รหัสผ่านไม่ตรงกัน";
+                valid = false;
+            } else {
+                confirmPasswordError.textContent = "";
+            }
+
+            return valid;
+        }
+    </script>
+</body>
+</html>

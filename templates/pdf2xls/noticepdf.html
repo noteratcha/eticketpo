@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="th"> <!-- กำหนดภาษาเริ่มต้นเป็นภาษาไทย -->
+<head>
+    <meta charset="UTF-8"> <!-- กำหนดการเข้ารหัสตัวอักษรเป็น UTF-8 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- กำหนดให้หน้าเว็บรองรับการแสดงผลแบบ Responsive -->
+    <title>Upload PDF</title> <!-- ชื่อของหน้าเว็บ -->
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5; /* สีพื้นหลังของหน้าเว็บ */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center; /* จัดให้อยู่ตรงกลางในแนวนอน */
+            align-items: center; /* จัดให้อยู่ตรงกลางในแนวตั้ง */
+            height: 100vh; /* ความสูงของหน้าจอให้เต็ม */
+            color: #333; /* สีของข้อความ */
+        }
+
+        /* สไตล์สำหรับเนื้อหาหลัก */
+        .container {
+            background: white; /* สีพื้นหลังของกล่องเนื้อหา */
+            padding: 20px; /* การเว้นขอบภายใน */
+            border-radius: 8px; /* ทำให้ขอบของกล่องโค้งมน */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* เพิ่มเงาให้กับกล่อง */
+            text-align: center; /* จัดข้อความให้อยู่กึ่งกลาง */
+            width: 100%;
+            max-width: 400px; /* กำหนดความกว้างสูงสุดของกล่อง */
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 1.5em; /* ปรับขนาดตัวอักษร */
+            color: #007BFF; /* สีของหัวข้อ */
+        }
+
+        form {
+            display: flex;
+            flex-direction: column; /* จัดให้ช่องกรอกข้อมูลเรียงจากบนลงล่าง */
+            gap: 15px; /* ระยะห่างระหว่างแต่ละช่อง */
+        }
+
+        input[type="file"] {
+            padding: 10px; /* การเว้นขอบภายในของช่องอัปโหลดไฟล์ */
+            border: 1px solid #ccc; /* ขอบของช่องกรอกข้อมูล */
+            border-radius: 4px; /* ขอบโค้งมน */
+        }
+
+        button {
+            background-color: #007BFF; /* สีพื้นหลังของปุ่ม */
+            color: white; /* สีตัวอักษรในปุ่ม */
+            border: none; /* ไม่มีเส้นขอบ */
+            border-radius: 4px; /* ขอบโค้งมน */
+            padding: 10px; /* การเว้นขอบภายใน */
+            cursor: pointer; /* เปลี่ยนเคอร์เซอร์เป็นแบบมือเมื่อวางเมาส์บนปุ่ม */
+            font-size: 1em; /* ขนาดตัวอักษร */
+        }
+
+        button:hover {
+            background-color: #0056b3; /* สีพื้นหลังของปุ่มเมื่อวางเมาส์ */
+        }
+
+        /* ส่วนที่แสดงผลลัพธ์หลังจากการอัปโหลด */
+        #output {
+            margin-top: 20px;
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* เพิ่มเงา */
+            display: none; /* ซ่อนกล่องผลลัพธ์ในตอนแรก */
+        }
+
+        #output h2 {
+            font-size: 1.5em;
+            color: #007BFF; /* สีของหัวข้อผลลัพธ์ */
+        }
+
+        pre {
+            white-space: pre-wrap; /* แสดงผลการจัดบรรทัดแบบดั้งเดิม */
+            word-wrap: break-word; /* ตัดคำถ้าบรรทัดยาวเกินไป */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>อัปโหลดไฟล์ PDF<br>ใบแจ้งเตือนให้มาชำระค่าปรับ</h1> <!-- หัวข้อของหน้า -->
+        
+        <!-- ฟอร์มสำหรับการอัปโหลดไฟล์ PDF -->
+        <form action="/upload_notice" method="post" enctype="multipart/form-data">
+            <input type="file" name="pdf" accept="application/pdf" required> <!-- ช่องสำหรับการเลือกไฟล์ PDF -->
+            <button type="submit">อัปโหลด</button> <!-- ปุ่มส่งข้อมูล -->
+        </form>
+
+        <!-- กล่องแสดงผลลัพธ์หลังการอัปโหลด (แสดงเมื่อมีผลลัพธ์) -->
+        <div id="output">
+            {% if output %} <!-- เช็คว่ามีข้อมูลที่จะแสดงผลหรือไม่ (ใช้ใน Flask หรือ Jinja2) -->
+                <h2>ผลลัพธ์</h2>
+                <pre>{{ output }}</pre> <!-- แสดงผลลัพธ์ในรูปแบบข้อความ -->
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
